@@ -1,0 +1,62 @@
+version: "3"
+
+services:
+
+  db:
+    image: postgres
+    container_name: dbserasa
+    environment:
+      - POSTGRES_DB=serasa
+      - POSTGRES_USER=serasa
+      - POSTGRES_PASSWORD=serasa
+    ports:
+      - '5430:5432'
+    expose:
+      - "5432"
+    networks:
+      - backend
+    restart: always
+
+  app:
+    container_name: api-serasa
+    build:
+      dockerfile: Dockerfile
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=src/app
+    volumes:
+      - ./src/:/app/src/
+      - ./migrations/:/app/migrations/
+    ports:
+      - '3001:3001'
+    expose:
+      - "3001"
+    depends_on:
+      - db
+    networks:
+      - backend
+    restart: always
+    #command: sh -c "flask db migrate && flask db upgrade && gunicorn -w 6 -b 0.0.0.0:3000 --timeout 120 --reload 'main:gunicorn_app'"
+    command: sh -c "python main.py"
+
+  redis:
+    image: redis
+    container_name: redis-serasa
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    depends_on:
+      - app
+    networks:
+      - backend
+    restart: always
+
+    command: redis-server
+
+
+networks:
+  backend:
+    driver: "bridge"
