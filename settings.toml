@@ -9,11 +9,14 @@ CACHE_REDIS_DB = 0
 CACHE_REDIS_URL = 'redis://localhost:6379/0'
 CACHE_DEFAULT_TIMEOUT = 500
 BUNDLE_ERRORS = true
-SQLALCHEMY_DATABASE_URI = 'postgresql://admin:admin@db-serasa:5432/imobabranco'
+SQLALCHEMY_DATABASE_URI = 'postgresql://serasa:serasa@localhost:5430/serasa'
 EXTENSIONS = [
-    #'src.extensions.database:init_app',
+    'src.extensions.database:init_app',
     'src.extensions.cache:init_app',
-    'src.routes.blueprint:init_app',
+    'src.extensions.csrf:init_app',
+    'src.extensions.swagger:init_app',
+    'src.extensions.marshmallow:init_app',
+    'src.api.v1:init_app'
 ]
 
 [production]
