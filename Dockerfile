@@ -20,4 +20,3 @@ RUN pip install --upgrade pip
 
 # Instalação das Dependencias
 RUN pip install -r requirements.txt
-
