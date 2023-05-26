@@ -17,13 +17,25 @@ services:
       - backend
     restart: always
 
+
+  redis:
+    image: redis
+    container_name: redisserasa
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - backend
+    restart: always
+    command: redis-server
+
   app:
     container_name: api-serasa
     build:
       dockerfile: Dockerfile
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=src/app
     volumes:
       - ./src/:/app/src/
       - ./migrations/:/app/migrations/
@@ -33,29 +45,14 @@ services:
       - "3001"
     depends_on:
       - db
+      - redis
     networks:
       - backend
+    environment:
+      - FLASK_APP=src/app.py
     restart: always
     #command: sh -c "flask db migrate && flask db upgrade && gunicorn -w 6 -b 0.0.0.0:3000 --timeout 120 --reload 'main:gunicorn_app'"
-    command: sh -c "python main.py"
-
-  redis:
-    image: redis
-    container_name: redis-serasa
-    ports:
-      - "6379:6379"
-    expose:
-      - "6379"
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    depends_on:
-      - app
-    networks:
-      - backend
-    restart: always
-
-    command: redis-server
-
+    command: sh -c "flask db migrate && flask db upgrade && python main.py"
 
 networks:
   backend:

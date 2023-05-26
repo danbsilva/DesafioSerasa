@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copiando aqruivos
 COPY requirements.txt .
-COPY settings.toml .
+COPY .env .
 COPY main.py .
 
 # venv
