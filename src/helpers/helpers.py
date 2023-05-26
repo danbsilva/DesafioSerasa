@@ -1,25 +1,21 @@
-import datetime
-from json import JSONEncoder
-import dateutil.parser
+from functools import wraps
+from flask_restful import output_json
+from src.api.security.cryptography import encrypt
 
 
-# subclass JSONEncoder
-class DateTimeEncoder(JSONEncoder):
-        #Override the default method
-        def default(self, objs):
-            for obj in objs:
-                if isinstance(obj, (datetime.date, datetime.datetime)):
-                    objs.append(obj.isoformat())
+def verify_record_exists(model, key, crypt=False):
+    def wrapper(func):
+        @wraps(func)
+        def decorated(*args, **kwargs):
+            cls = model
+            k = list(kwargs.keys())[list(kwargs.values()).index(kwargs[key])]
 
-            return objs
-
-
-# custom Decoder
-def DecodeDateTime(empDict):
-    if 'created_at' in empDict:
-      empDict["created_at"] = dateutil.parser.parse(empDict["created_at"])
-
-    if 'updated_at' in empDict:
-      empDict["updated_at"] = dateutil.parser.parse(empDict["updated_at"])
-
-    return empDict
+            if crypt:
+                value = {k: encrypt(kwargs[key])}
+            else:
+                value = {k: kwargs[key]}
+            obj = cls.query.filter_by(**value).first()
+            if obj: return output_json({'message': f'{cls.__name__} already exists'}, 400)
+            return func(*args, **kwargs)
+        return decorated
+    return wrapper

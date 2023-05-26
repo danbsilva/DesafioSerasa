@@ -6,6 +6,7 @@ from flask_rest_paginate import Pagination
 db = SQLAlchemy()
 pagination = Pagination()
 
+
 def init_app(app):
     db.init_app(app)
     Migrate(app, db)

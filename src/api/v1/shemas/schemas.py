@@ -1,5 +1,6 @@
 from src.extensions.marshmallow import ma
 from src.models.models import User
+from src.api.security.cryptography import encrypt, decrypt
 
 
 class UserReadSchema(ma.SQLAlchemyAutoSchema):
@@ -7,11 +8,16 @@ class UserReadSchema(ma.SQLAlchemyAutoSchema):
         model = User
         exclude = ('id','password',)
 
+    cpf = ma.auto_field(required=True, )
+    email = ma.auto_field(required=True)
+    phone_number = ma.auto_field(required=True)
+
+
 
 class UserCreateSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        exclude = ('id','password','uuid','created_at','updated_at',)
+        exclude = ('id','uuid','created_at','updated_at',)
 
     name = ma.auto_field(required=True)
     cpf = ma.auto_field(required=True)
