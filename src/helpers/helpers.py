@@ -9,7 +9,6 @@ def verify_record_exists(model, key, crypt=False):
         def decorated(*args, **kwargs):
             cls = model
             k = list(kwargs.keys())[list(kwargs.values()).index(kwargs[key])]
-
             if crypt:
                 value = {k: encrypt(kwargs[key])}
             else:
